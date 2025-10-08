@@ -1,28 +1,22 @@
 /** @format */
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
+import { MyStore } from "../context/RecipeContext";
 
 const AddRecipes = () => {
-  const [recipe, setRecipe] = useState({
-    name: "",
-    ingredients: "",
-    cookingTime: "",
-    difficulty: "",
-    image: null,
-  });
+  const { recipeData, setRecipeData } = useContext(MyStore);
+  const { register, handleSubmit, reset } = useForm();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRecipe({ ...recipe, [name]: value });
-  };
+  const formData = (data) => {
+    const updatedArr = [...recipeData, data];
 
-  const handleImageChange = (e) => {
-    setRecipe({ ...recipe, image: e.target.files[0] });
-  };
+    localStorage.setItem("recipes", JSON.stringify(updatedArr));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Recipe Added:", recipe);
-    alert("Recipe added successfully!");
+    setRecipeData(updatedArr);
+
+    console.log(updatedArr);
+
+    reset();
   };
 
   return (
@@ -32,17 +26,16 @@ const AddRecipes = () => {
           Add a New Recipe
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(formData)} className="space-y-4">
           {/* Recipe Name */}
           <div>
             <label className="block mb-1 font-medium text-gray-700">
               Recipe Name
             </label>
             <input
+              {...register("name")}
               type="text"
               name="name"
-              value={recipe.name}
-              onChange={handleChange}
               placeholder="Enter recipe name"
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
@@ -55,9 +48,8 @@ const AddRecipes = () => {
               Ingredients
             </label>
             <textarea
+              {...register("ingredients")}
               name="ingredients"
-              value={recipe.ingredients}
-              onChange={handleChange}
               placeholder="List ingredients separated by commas"
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               rows="3"
@@ -72,9 +64,21 @@ const AddRecipes = () => {
             </label>
             <input
               type="number"
+              {...register("cookingTime")}
               name="cookingTime"
-              value={recipe.cookingTime}
-              onChange={handleChange}
+              placeholder="e.g. 30"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              required
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">
+              Price (in $)
+            </label>
+            <input
+              type="number"
+              {...register("price")}
+              name="Price"
               placeholder="e.g. 30"
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
@@ -87,9 +91,8 @@ const AddRecipes = () => {
               Difficulty
             </label>
             <select
+              {...register("difficulty")}
               name="difficulty"
-              value={recipe.difficulty}
-              onChange={handleChange}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             >
@@ -106,9 +109,9 @@ const AddRecipes = () => {
               Recipe Image
             </label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
+              {...register("image")}
+              type="url"
+              // accept="image/*"
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
